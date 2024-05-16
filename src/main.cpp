@@ -1,3 +1,6 @@
+//Game Engine Development - Assignment 1
+//Group Members: Brandon Norris & Devin Coles
+
 #include <include/raylib.h>
 #include <imgui/imgui.h>
 #include <imgui/rlImGui.h>
@@ -6,6 +9,70 @@
 #include <iostream>
 #include <fstream>
 
+#include <vector>
+
+
+//Shape Parent Class
+class Shape {
+
+    public:
+        std::string Name;
+        int X = 0;
+        int Y = 0;
+        int SX = 0;
+        int SY = 0;
+        int Red = 0;
+        int Green = 0;
+        int Blue = 0;
+
+        int Length = 0;
+        int Width = 0;
+
+        int Radius = 0;
+
+};
+
+//Circle Child Class
+class Circle: public Shape {
+
+    int Radius = 0;
+
+    Circle(std::string Name, int X, int Y, int SX, int SY, int Red, int Green, int Blue, int Radius) {
+        this->Name = "";
+        this->X = X;
+        this->Y = Y;
+        this->SX = SX;
+        this->SY = SY;
+        this->Red = Red;
+        this->Green = Green;
+        this->Blue = Blue;
+        this->Radius = Radius;
+        
+    }
+};
+
+//Rect Child Class
+class Rect : public Shape {
+
+    int Length = 0;
+    int Width = 0;
+
+    Rect(std::string Name, int X, int Y, int SX, int SY, int Red, int Green, int Blue, int Length, int Width) {
+        this->Name = "";
+        this->X = X;
+        this->Y = Y;
+        this->SX = SX;
+        this->SY = SY;
+        this->Red = Red;
+        this->Green = Green;
+        this->Blue = Blue;
+        this->Length = Length;
+        this->Width = Width;
+
+    }
+};
+
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -13,6 +80,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+    //original dimensions: 1280 x 800
     const int screenWidth = 1280;
     const int screenHeight = 800;
 
@@ -40,6 +108,10 @@ int main(void)
     float circY=50.0f;
     float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
 
+    //std::vector<Shape> shapes;
+    bool posY = true;
+    bool posX = true;
+
     //Let's draw some text to the screen too
     bool drawText=true;
     std::string strText= "Some Text";
@@ -55,9 +127,10 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
 
+
         //move circle
-        circX+=circSpeedX;
-        circY+=circSpeedY;
+        circX += circSpeedX;
+        circY += circSpeedY;
 
         // Draw
         //----------------------------------------------------------------------------------
