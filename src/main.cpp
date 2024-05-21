@@ -100,13 +100,17 @@ int main(void)
 
     //shape properties to draw on the screen (circle for this example)
     //units of size and speed are in pixels
-    float circRadius=50;
-    float circSpeedX=1.0f;
-    float circSpeedY=0.5f;
-    bool drawCirc=true;
-    float circX=50.0f;
-    float circY=50.0f;
+    float obj1Radius=50;
+    float obj1SpeedX=1.0f;
+    float obj1SpeedY=0.5f;
+    bool drawObj1=true;
+    float obj1X=50.0f;
+    float obj1Y=50.0f;
     float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
+
+    //booleans to keep track of direction
+    bool obj1Right = true;
+    bool obj1Down = true;
 
     //std::vector<Shape> shapes;
     bool posY = true;
@@ -128,10 +132,33 @@ int main(void)
         //----------------------------------------------------------------------------------
 
 
-        //move circle
-        circX += circSpeedX;
-        circY += circSpeedY;
+        //move Object1 and detecting if it has hit the side of the screen
+        if (obj1Right) 
+        {
+            obj1X += obj1SpeedX;
+            if (obj1X + obj1Radius == screenWidth)
+                obj1Right = false;
+        }
+        else 
+        {
+            obj1X -= obj1SpeedX;
+            if (obj1X - obj1Radius == 0)
+                obj1Right = true;
+        }
 
+        if (obj1Down) 
+        {
+            obj1Y += obj1SpeedY;
+            if (obj1Y + obj1Radius == screenHeight)
+                obj1Down = false;
+        }
+        else
+        {
+            obj1Y -= obj1SpeedY;
+            if (obj1Y - obj1Radius == 0)
+                obj1Down = true;
+        }
+        
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -141,8 +168,8 @@ int main(void)
             //********** Raylib Drawing Content **********
 
             //draw the cricle (center x, center y, radius, color(r,g,b,a))
-            if(drawCirc){
-                DrawCircle((int)circX, (int)circY, circRadius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
+            if(drawObj1){
+                DrawCircle((int)obj1X, (int)obj1Y, obj1Radius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
             }
             
             //draw the text
@@ -175,19 +202,19 @@ int main(void)
                     if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
                     {
                         //checkboxes, they directly modify the value (which is why we send a reference)
-                        ImGui::Checkbox("Draw Cricle", &drawCirc);
+                        ImGui::Checkbox("Draw Cricle", &drawObj1);
 
                         //slider, again directly modifies the value and limites between 0 and 300 for this example
-                        ImGui::SliderFloat("Radius", &circRadius, 0.0f, 300.0f);
+                        ImGui::SliderFloat("Radius", &obj1Radius, 0.0f, 300.0f);
 
                         //color picker button, directly modifies the color (3 element float array)
-                        ImGui::ColorEdit3("Circle Color", color);
+                        ImGui::ColorEdit3("Object1 Color", color);
 
                         //Another button
-                        if (ImGui::Button("Reset Circle")) {
-                            circX = 50.0;
-                            circY = 50.0;
-                            circRadius = 50;
+                        if (ImGui::Button("Reset Object1")) {
+                            obj1X = 50.0;
+                            obj1Y = 50.0;
+                            obj1Radius = 50;
                         }
                     }
 
