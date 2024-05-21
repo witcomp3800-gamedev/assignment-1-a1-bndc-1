@@ -82,7 +82,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     //original dimensions: 1280 x 800
     const int screenWidth = 1280;
-    const int screenHeight = 800;
+    const int screenHeight = 720;
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "Assignment 1 Starter Code");
@@ -167,34 +167,53 @@ int main(void)
                 //creates a new window
                 ImGui::Begin("My Window",NULL,ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
                     ImGui::Text("The Window Text!");
-                    //checkboxes, they directly modify the value (which is why we send a reference)
-                    ImGui::Checkbox("Draw Cricle",&drawCirc);
-                    ImGui::SameLine();
-                    ImGui::Checkbox("Draw Text",&drawText);
+                    //A listbox to select which object is being modified
+                    const char* items[] = { "Object1","Object2","Text"};
+                    static int item_current = 0;
+                    ImGui::Combo("Object\nSelect", &item_current, items, IM_ARRAYSIZE(items),1);
 
-                    //slider, again directly modifies the value and limites between 0 and 300 for this example
-                    ImGui::SliderFloat("Radius",&circRadius,0.0f,300.0f);
-                    
-                    //color picker button, directly modifies the color (3 element float array)
-                    ImGui::ColorEdit3("Circle Color",color);
-                    
-                    //text input field, directly modifies the string
-                    ImGui::InputText("Text",&newText);
-                    
-                    //buttons, returns true if clicked on this frame
-                    if(ImGui::Button("Set Text")){
-                        strText=newText;
+                    if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
+                    {
+                        //checkboxes, they directly modify the value (which is why we send a reference)
+                        ImGui::Checkbox("Draw Cricle", &drawCirc);
+
+                        //slider, again directly modifies the value and limites between 0 and 300 for this example
+                        ImGui::SliderFloat("Radius", &circRadius, 0.0f, 300.0f);
+
+                        //color picker button, directly modifies the color (3 element float array)
+                        ImGui::ColorEdit3("Circle Color", color);
+
+                        //Another button
+                        if (ImGui::Button("Reset Circle")) {
+                            circX = 50.0;
+                            circY = 50.0;
+                            circRadius = 50;
+                        }
+                    }
+
+                    if (item_current == 1) //when Object2 is selected in the Object Select ComboBox
+                    {
+                        //needs implementation when second object is created
+                    }
+
+                    if (item_current == 2) //when Text is selected in the Object Select ComboBox
+                    {
+                        //checkboxes, they directly modify the value (which is why we send a reference)
+                        ImGui::Checkbox("Draw Text", &drawText);
+
+                        //text input field, directly modifies the string
+                        ImGui::InputText("Text", &newText);
+
+                        //buttons, returns true if clicked on this frame
+                        if (ImGui::Button("Set Text")) {
+                            strText = newText;
+                        }
                     }
 
                     //The next item will be on the same line as the previous one
-                    ImGui::SameLine();
+                    //ImGui::SameLine();
 
-                    //Another button
-                    if(ImGui::Button("Reset Circle")){
-                        circX=50.0;
-                        circY=50.0;
-                        circRadius=50;
-                    }
+                    
                 //ends this window
                 ImGui::End();
 
