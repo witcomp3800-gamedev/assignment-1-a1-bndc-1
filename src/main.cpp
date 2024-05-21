@@ -104,9 +104,12 @@ int main(void)
     float obj1SpeedX=1.0f;
     float obj1SpeedY=0.5f;
     bool drawObj1=true;
+    bool drawObj1Text = true;
     float obj1X=50.0f;
     float obj1Y=50.0f;
     float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
+    std::string obj1Name = "Object1";
+    std::string obj1NewText = obj1Name;
 
     //booleans to keep track of direction
     bool obj1Right = true;
@@ -136,26 +139,26 @@ int main(void)
         if (obj1Right) 
         {
             obj1X += obj1SpeedX;
-            if (obj1X + obj1Radius == screenWidth)
+            if (obj1X + obj1Radius >= screenWidth)
                 obj1Right = false;
         }
         else 
         {
             obj1X -= obj1SpeedX;
-            if (obj1X - obj1Radius == 0)
+            if (obj1X - obj1Radius <= 0)
                 obj1Right = true;
         }
 
         if (obj1Down) 
         {
             obj1Y += obj1SpeedY;
-            if (obj1Y + obj1Radius == screenHeight)
+            if (obj1Y + obj1Radius >= screenHeight)
                 obj1Down = false;
         }
         else
         {
             obj1Y -= obj1SpeedY;
-            if (obj1Y - obj1Radius == 0)
+            if (obj1Y - obj1Radius <= 0)
                 obj1Down = true;
         }
         
@@ -170,6 +173,14 @@ int main(void)
             //draw the cricle (center x, center y, radius, color(r,g,b,a))
             if(drawObj1){
                 DrawCircle((int)obj1X, (int)obj1Y, obj1Radius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
+
+                //get the size (x and y) of the text object
+                //(font,c string, font size, font spaceing)
+                Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
+
+                //draw the text (using the text size to help draw it in the corner
+                //(font,c string, vector2, font size, font spaceing, color)
+                DrawTextEx(font, obj1Name.c_str(), {obj1X - (textSize.x/3), obj1Y - (textSize.y/2)}, 18, 1, WHITE);
             }
             
             //draw the text
@@ -202,7 +213,9 @@ int main(void)
                     if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
                     {
                         //checkboxes, they directly modify the value (which is why we send a reference)
-                        ImGui::Checkbox("Draw Cricle", &drawObj1);
+                        ImGui::Checkbox("Draw Object1", &drawObj1);
+                        ImGui::SameLine();
+                        ImGui::Checkbox("Draw Object1 Text", &drawObj1Text);
 
                         //slider, again directly modifies the value and limites between 0 and 300 for this example
                         ImGui::SliderFloat("Radius", &obj1Radius, 0.0f, 300.0f);
@@ -210,11 +223,18 @@ int main(void)
                         //color picker button, directly modifies the color (3 element float array)
                         ImGui::ColorEdit3("Object1 Color", color);
 
-                        //Another button
+                        //text input field, directly modifies the string
+                        ImGui::InputText("Text", &obj1NewText);
+
+                        //Buttons
                         if (ImGui::Button("Reset Object1")) {
                             obj1X = 50.0;
                             obj1Y = 50.0;
                             obj1Radius = 50;
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Set Text")) {
+                            obj1Name = obj1NewText;
                         }
                     }
 
