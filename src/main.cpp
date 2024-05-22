@@ -107,13 +107,31 @@ int main(void)
     bool drawObj1Text = true;
     float obj1X=50.0f;
     float obj1Y=50.0f;
-    float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
+    float obj1Color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
     std::string obj1Name = "Object1";
     std::string obj1NewText = obj1Name;
-
     //booleans to keep track of direction
     bool obj1Right = true;
     bool obj1Down = true;
+
+
+    //shape properties to draw on the screen (circle for this example)
+    //units of size and speed are in pixels
+    float obj2Length = 30;
+    float obj2Width = 60;
+    float obj2SpeedX = 1.0f;
+    float obj2SpeedY = 0.5f;
+    bool drawObj2 = true;
+    bool drawObj2Text = true;
+    float obj2X = 1000.0f;
+    float obj2Y = 50.0f;
+    float obj2Color[3] = { 1.0f,0.5f,0.0f }; //color is from 0-1
+    std::string obj2Name = "Object2";
+    std::string obj2NewText = obj1Name;
+    //booleans to keep track of direction
+    bool obj2Right = false;
+    bool obj2Down = true;
+
 
     //std::vector<Shape> shapes;
     bool posY = true;
@@ -161,6 +179,33 @@ int main(void)
             if (obj1Y - obj1Radius <= 0)
                 obj1Down = true;
         }
+
+        //move Object2 and detecting if it has hit the side of the screen
+        if (obj2Right)
+        {
+            obj2X += obj2SpeedX;
+            if (obj2X + obj2Width >= screenWidth)
+                obj2Right = false;
+        }
+        else
+        {
+            obj2X -= obj2SpeedX;
+            if (obj2X - obj2Width <= 0)
+                obj2Right = true;
+        }
+
+        if (obj2Down)
+        {
+            obj2Y += obj2SpeedY;
+            if (obj2Y + obj2Length >= screenHeight)
+                obj2Down = false;
+        }
+        else
+        {
+            obj2Y -= obj2SpeedY;
+            if (obj2Y - obj2Length <= 0)
+                obj2Down = true;
+        }
         
         // Draw
         //----------------------------------------------------------------------------------
@@ -170,17 +215,36 @@ int main(void)
 
             //********** Raylib Drawing Content **********
 
-            //draw the cricle (center x, center y, radius, color(r,g,b,a))
+            //draw the cicle (center x, center y, radius, color(r,g,b,a))
             if(drawObj1){
-                DrawCircle((int)obj1X, (int)obj1Y, obj1Radius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
+                DrawCircle((int)obj1X, (int)obj1Y, obj1Radius, ColorFromNormalized({ obj1Color[0],obj1Color[1],obj1Color[2],1.0f }));
 
-                //get the size (x and y) of the text object
-                //(font,c string, font size, font spaceing)
-                Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
+                if (drawObj1Text) 
+                {
+                    //get the size (x and y) of the text object
+                    //(font,c string, font size, font spaceing)
+                    Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
 
-                //draw the text (using the text size to help draw it in the corner
-                //(font,c string, vector2, font size, font spaceing, color)
-                DrawTextEx(font, obj1Name.c_str(), {obj1X - (textSize.x/3), obj1Y - (textSize.y/2)}, 18, 1, WHITE);
+                    //draw the text (using the text size to help draw it in the corner
+                    //(font,c string, vector2, font size, font spaceing, color)
+                    DrawTextEx(font, obj1Name.c_str(), { obj1X - (textSize.x / 3), obj1Y - (textSize.y / 2) }, 18, 1, WHITE);
+                }
+            }
+
+            //draw the rectangle (center x, center y, width, height, color(r,g,b,a))
+            if (drawObj2) {
+                DrawRectangle((int)obj2X, (int)obj2Y, obj2Width, obj2Length, ColorFromNormalized({ obj2Color[0],obj2Color[1],obj2Color[2],1.0f }));
+
+                if(drawObj2Text)
+                {
+                    //get the size (x and y) of the text object
+                    //(font,c string, font size, font spaceing)
+                    Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
+
+                    //draw the text (using the text size to help draw it in the corner
+                    //(font,c string, vector2, font size, font spaceing, color)
+                    DrawTextEx(font, obj2Name.c_str(), { obj2X - (textSize.x / 8), obj2Y + (textSize.y / 2) }, 18, 1, WHITE);
+                }
             }
             
             //draw the text
@@ -220,8 +284,11 @@ int main(void)
                         //slider, again directly modifies the value and limites between 0 and 300 for this example
                         ImGui::SliderFloat("Radius", &obj1Radius, 0.0f, 300.0f);
 
+                        ImGui::SliderFloat("SpeedX", &obj1SpeedX, 0.0f, 150.0f);
+                        ImGui::SliderFloat("SpeedY", &obj1SpeedY, 0.0f, 75.0f);
+
                         //color picker button, directly modifies the color (3 element float array)
-                        ImGui::ColorEdit3("Object1 Color", color);
+                        ImGui::ColorEdit3("Object1 Color", obj1Color);
 
                         //text input field, directly modifies the string
                         ImGui::InputText("Text", &obj1NewText);
@@ -240,7 +307,34 @@ int main(void)
 
                     if (item_current == 1) //when Object2 is selected in the Object Select ComboBox
                     {
-                        //needs implementation when second object is created
+                        ImGui::Checkbox("Draw Object2", &drawObj2);
+                        ImGui::SameLine();
+                        ImGui::Checkbox("Draw Object2 Text", &drawObj2Text);
+
+                        //slider, again directly modifies the value and limites between 0 and 300 for this example
+                        ImGui::SliderFloat("Length", &obj2Length, 0.0f, 300.0f);
+                        ImGui::SliderFloat("Width", &obj2Width, 0.0f, 300.0f);
+
+                        ImGui::SliderFloat("SpeedX", &obj2SpeedX, 0.0f, 150.0f);
+                        ImGui::SliderFloat("SpeedY", &obj2SpeedY, 0.0f, 75.0f);
+
+                        //color picker button, directly modifies the color (3 element float array)
+                        ImGui::ColorEdit3("Object1 Color", obj2Color);
+
+                        //text input field, directly modifies the string
+                        ImGui::InputText("Text", &obj2NewText);
+
+                        //Buttons
+                        if (ImGui::Button("Reset Object1")) {
+                            obj2X = 1000.0;
+                            obj2Y = 50.0;
+                            obj2Length = 30;
+                            obj2Width = 60;
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Set Text")) {
+                            obj2Name = obj2NewText;
+                        }
                     }
 
                     if (item_current == 2) //when Text is selected in the Object Select ComboBox
