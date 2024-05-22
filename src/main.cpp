@@ -11,24 +11,31 @@
 
 #include <vector>
 
+//original dimensions: 1280 x 800
+const int windowWidth = 1280;
+const int windowHeight = 720;
+
 
 //Shape Parent Class
 class Shape {
 
     public:
-        std::string Name;
-        int X = 0;
-        int Y = 0;
-        int SX = 0;
-        int SY = 0;
-        int Red = 0;
-        int Green = 0;
-        int Blue = 0;
+        float objSpeedX;
+        float objSpeedY;
+        bool drawObj;
+        bool drawObjText;
+        float objX;
+        float objY;
+        float objColor[3]; //color is from 0-1
+        std::string objName;
+        std::string objNewText;
 
-        int Length = 0;
-        int Width = 0;
+        //object direction booleans
+        bool objRight = true;
+        bool objDown = true;
 
-        int Radius = 0;
+        //virtual move declaration, to apply movement logic from subclasses
+        virtual void move(){};
 
 };
 
@@ -36,136 +43,111 @@ class Shape {
 class Circle: public Shape {
 
     float objRadius;
-    float objSpeedX;
-    float objSpeedY;
-    bool drawObj;
-    bool drawObjText;
-    float objX;
-    float objY;
-    float objColor[3]; //color is from 0-1
-    std::string objName;
-    std::string objNewText;
 
-    //object direction booleans
-    bool objRight = true;
-    bool objDown = true;
-
-    Circle(float objRadius, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objColor[3], std::string objName) {
-        this->objRadius = objRadius;
-        this->objSpeedX = objSpeedX;
-        this->objSpeedY = objSpeedY;
-        this->drawObj = drawObj;
-        this->drawObjText = drawObjText;
-        this->objX = objX;
-        this->objY = objY;
-        this->objColor[0] = objColor[0];
-        this->objColor[1] = objColor[1];
-        this->objColor[2] = objColor[2];
-        this->objName = objName;
-        this->objNewText = objName;
-    }
-
-    void move(int screenWidth, int screenHeight) {
-        if (objRight)
-        {
-            objX += objSpeedX;
-            if (objX + objRadius >= screenWidth)
-                objRight = false;
-        }
-        else
-        {
-            objX -= objSpeedX;
-            if (objX - objRadius <= 0)
-                objRight = true;
+    public:
+        Circle(float objRadius, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objR, float objG, float objB, std::string objName) {
+        
+            this->objRadius = objRadius;
+            this->objSpeedX = objSpeedX;
+            this->objSpeedY = objSpeedY;
+            this->drawObj = drawObj;
+            this->drawObjText = drawObjText;
+            this->objX = objX;
+            this->objY = objY;
+            this->objColor[0] = objR;
+            this->objColor[1] = objG;
+            this->objColor[2] = objB;
+            this->objName = objName;
+            this->objNewText = objName;
         }
 
-        if (objDown)
-        {
-            objY += objSpeedY;
-            if (objY + objRadius >= screenHeight)
-                objDown = false;
+        void move() {
+            if (objRight)
+            {
+                objX += objSpeedX;
+                if (objX + objRadius >= windowWidth)
+                    objRight = false;
+            }
+            else
+            {
+                objX -= objSpeedX;
+                if (objX - objRadius <= 0)
+                    objRight = true;
+            }
+
+            if (objDown)
+            {
+                objY += objSpeedY;
+                if (objY + objRadius >= windowHeight)
+                    objDown = false;
+            }
+            else
+            {
+                objY -= objSpeedY;
+                if (objY - objRadius <= 0)
+                    objDown = true;
+            }
         }
-        else
-        {
-            objY -= objSpeedY;
-            if (objY - objRadius <= 0)
-                objDown = true;
-        }
-    }
 
 };
 
 //Rect Child Class
 class Rect : public Shape {
 
+        float objLength;
+        float objWidth;
 
-private:
-    float objLength;
-    float objWidth;
-    float objSpeedX;
-    float objSpeedY;
-    bool drawObj;
-    bool drawObjText;
-    float objX;
-    float objY;
-    float objColor[3]; //color is from 0-1
-    std::string objName;
-    std::string objNewText;
-
-    //object direction booleans
-    bool objRight = false;
-    bool objDown = true;
-
-public:
-    Rect(float objLength, float objWidth, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objColor[3], std::string objName) {
-        this->objLength = objLength;
-        this->objWidth = objWidth;
-        this->objSpeedX = objSpeedX;
-        this->objSpeedY = objSpeedY;
-        this->drawObj = drawObj;
-        this->drawObjText = drawObjText;
-        this->objX = objX;
-        this->objY = objY;
-        this->objColor[0] = objColor[0];
-        this->objColor[1] = objColor[1];
-        this->objColor[2] = objColor[2];
-        this->objName = objName;
-        this->objNewText = objName;
-    }
-
-    void move(int screenWidth, int screenHeight) {
-        if (objRight)
-        {
-            objX += objSpeedX;
-            if (objX + objWidth >= screenWidth)
-                objRight = false;
-        }
-        else
-        {
-            objX -= objSpeedX;
-            if (objX - objWidth <= 0)
-                objRight = true;
+    public:
+        Rect(float objLength, float objWidth, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objR, float objG, float objB, std::string objName) {
+            this->objLength = objLength;
+            this->objWidth = objWidth;
+            this->objSpeedX = objSpeedX;
+            this->objSpeedY = objSpeedY;
+            this->drawObj = drawObj;
+            this->drawObjText = drawObjText;
+            this->objX = objX;
+            this->objY = objY;
+            this->objColor[0] = objR;
+            this->objColor[1] = objG;
+            this->objColor[2] = objB;
+            this->objName = objName;
+            this->objNewText = objName;
         }
 
-        if (objDown)
-        {
-            objY += objSpeedY;
-            if (objY + objLength >= screenHeight)
-                objDown = false;
+        void move() {
+            if (objRight)
+            {
+                objX += objSpeedX;
+                if (objX + objWidth >= windowWidth)
+                    objRight = false;
+            }
+            else
+            {
+                objX -= objSpeedX;
+                if (objX - objWidth <= 0)
+                    objRight = true;
+            }
+
+            if (objDown)
+            {
+                objY += objSpeedY;
+                if (objY + objLength >= windowHeight)
+                    objDown = false;
+            }
+            else
+            {
+                objY -= objSpeedY;
+                if (objY - objLength <= 0)
+                    objDown = true;
+            }
         }
-        else
-        {
-            objY -= objSpeedY;
-            if (objY - objLength <= 0)
-                objDown = true;
-        }
-    }
 
 };
 
 //object move function
-void Move_Shape(Shape obj) {
+void Update_Shape(Shape obj) {
 
+    obj.move();
 }
 
 
@@ -176,9 +158,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    //original dimensions: 1280 x 800
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
+    const int screenWidth = windowWidth;
+    const int screenHeight = windowHeight;
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "Assignment 1 Starter Code");
@@ -210,6 +191,11 @@ int main(void)
     bool obj1Right = true;
     bool obj1Down = true;
 
+
+
+    Circle obj1 = Circle(50.0f, 1.0f, 0.5f, true, true, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
+
+    //50.0f, 1.0f, 0.5f, true, true, 50.0f, 50.0f, { 0.0f,0.0f,1.0f }, "Object1"
 
     //shape properties to draw on the screen (circle for this example)
     //units of size and speed are in pixels
