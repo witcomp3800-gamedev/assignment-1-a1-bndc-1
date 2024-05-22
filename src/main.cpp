@@ -211,21 +211,23 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
 
-    //shape properties to draw on the screen (circle for this example)
-    //units of size and speed are in pixels
+    //circle & rect initialization
 
     //Object Parameters: Circle(float Radius, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
     Circle obj1 = Circle(50.0f, 1.0f, 0.5f, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
-
-
-    //shape properties to draw on the screen (circle for this example)
-    //units of size and speed are in pixels
     
     //Object Parameters: Rect(float Length, float Width, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
     Rect obj2 = Rect(30, 60, 1.0f, 0.5f, 900.0f, 50.0f, 1.0f, 0.5f, 0.0f, "Object2");
 
 
-    //std::vector<Shape> shapes;
+    //vector for shape storage
+    std::vector<Shape> shapes;
+
+    shapes.push_back(obj1);
+    shapes.push_back(obj2);
+
+
+
     bool posY = true;
     bool posX = true;
 
@@ -244,64 +246,6 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
 
-        /*
-        //move Object1 and detecting if it has hit the side of the screen
-        if (obj1Right) 
-        {
-            obj1X += obj1SpeedX;
-            if (obj1X + obj1Radius >= screenWidth)
-                obj1Right = false;
-        }
-        else 
-        {
-            obj1X -= obj1SpeedX;
-            if (obj1X - obj1Radius <= 0)
-                obj1Right = true;
-        }
-
-        if (obj1Down) 
-        {
-            obj1Y += obj1SpeedY;
-            if (obj1Y + obj1Radius >= screenHeight)
-                obj1Down = false;
-        }
-        else
-        {
-            obj1Y -= obj1SpeedY;
-            if (obj1Y - obj1Radius <= 0)
-                obj1Down = true;
-        }
-        */
-
-        /*
-        //move Object2 and detecting if it has hit the side of the screen
-        if (obj2Right)
-        {
-            obj2X += obj2SpeedX;
-            if (obj2X + obj2Width >= screenWidth)
-                obj2Right = false;
-        }
-        else
-        {
-            obj2X -= obj2SpeedX;
-            if (obj2X <= 0)
-                obj2Right = true;
-        }
-
-        if (obj2Down)
-        {
-            obj2Y += obj2SpeedY;
-            if (obj2Y + obj2Length >= screenHeight)
-                obj2Down = false;
-        }
-        else
-        {
-            obj2Y -= obj2SpeedY;
-            if (obj2Y <= 0)
-                obj2Down = true;
-        }
-        */
-
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -311,15 +255,20 @@ int main(void)
 
             //********** Raylib Drawing Content **********
 
-            //drawing from object rather than individual vars
-            //draw function for circle moved into circle class
+
+            //circle / rect drawing / movement; both done through updateShape function
+
+
+            //iterator for drawing shapes from vector; currently not working
+            /*
+            for (Shape i : shapes) {
+                updateShape(i, font);
+            }
+            */
+
+
             updateShape(obj1, font);
-
-            //drawing from object rather than individual vars
-            //draw function for rect moved into rect class
             updateShape(obj2, font);
-
-
 
             //draw the text
             if(drawText){
