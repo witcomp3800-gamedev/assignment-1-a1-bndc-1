@@ -12,8 +12,8 @@
 #include <vector>
 
 //original dimensions: 1280 x 800
-const int windowWidth = 1280;
-const int windowHeight = 720;
+const int windowWidth = 1000;
+const int windowHeight = 500;
 
 
 //Shape Parent Class
@@ -34,24 +34,26 @@ class Shape {
         bool objRight = true;
         bool objDown = true;
 
-        //virtual move declaration, to apply movement logic from subclasses
-        virtual void move(){};
+        //virtual function declarations, to apply logic from appropriate subclass
+        virtual void move() {};
+        virtual void draw(Font font) {};
 
 };
 
 //Circle Child Class
 class Circle: public Shape {
 
-    float objRadius;
-
     public:
-        Circle(float objRadius, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objR, float objG, float objB, std::string objName) {
+
+        float objRadius;
+
+        Circle(float objRadius, float objSpeedX, float objSpeedY, float objX, float objY, float objR, float objG, float objB, std::string objName) {
         
             this->objRadius = objRadius;
             this->objSpeedX = objSpeedX;
             this->objSpeedY = objSpeedY;
-            this->drawObj = drawObj;
-            this->drawObjText = drawObjText;
+            this->drawObj = true;
+            this->drawObjText = true;
             this->objX = objX;
             this->objY = objY;
             this->objColor[0] = objR;
@@ -66,29 +68,42 @@ class Circle: public Shape {
             {
                 objX += objSpeedX;
                 if (objX + objRadius >= windowWidth)
-                    objRight = false;
+                    this->objRight = false;
             }
             else
             {
                 objX -= objSpeedX;
                 if (objX - objRadius <= 0)
-                    objRight = true;
+                    this->objRight = true;
             }
 
             if (objDown)
             {
                 objY += objSpeedY;
                 if (objY + objRadius >= windowHeight)
-                    objDown = false;
+                    this->objDown = false;
             }
             else
             {
                 objY -= objSpeedY;
                 if (objY - objRadius <= 0)
-                    objDown = true;
+                    this->objDown = true;
             }
         }
 
+        void draw(Font font) {
+            DrawCircle((int)objX, (int)objY, objRadius, ColorFromNormalized({ objColor[0],objColor[1],objColor[2],1.0f }));
+            if (drawObjText)
+            {
+                //get the size (x and y) of the text object
+                //(font,c string, font size, font spaceing)
+                Vector2 textSize = MeasureTextEx(font, objName.c_str(), 18, 1);
+
+                //draw the text (using the text size to help draw it in the corner
+                //(font,c string, vector2, font size, font spaceing, color)
+                DrawTextEx(font, objName.c_str(), { objX - (textSize.x / 2), objY - (textSize.y / 2) }, 18, 1, WHITE);
+            }
+        }
 };
 
 //Rect Child Class
@@ -98,13 +113,13 @@ class Rect : public Shape {
         float objWidth;
 
     public:
-        Rect(float objLength, float objWidth, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objR, float objG, float objB, std::string objName) {
+        Rect(float objLength, float objWidth, float objSpeedX, float objSpeedY, float objX, float objY, float objR, float objG, float objB, std::string objName) {
             this->objLength = objLength;
             this->objWidth = objWidth;
             this->objSpeedX = objSpeedX;
             this->objSpeedY = objSpeedY;
-            this->drawObj = drawObj;
-            this->drawObjText = drawObjText;
+            this->drawObj = true;
+            this->drawObjText = true;
             this->objX = objX;
             this->objY = objY;
             this->objColor[0] = objR;
@@ -142,11 +157,17 @@ class Rect : public Shape {
             }
         }
 
+        void draw() {
+
+        }
+
 };
 
-//object move function
-void Update_Shape(Shape obj) {
-
+//object update function
+void updateShape(Shape& obj, Font font) {
+    if (obj.drawObj) {
+        obj.draw(font);
+    }
     obj.move();
 }
 
@@ -175,6 +196,8 @@ int main(void)
     // General variables
     //--------------------------------------------------------------------------------------
 
+
+    /*
     //shape properties to draw on the screen (circle for this example)
     //units of size and speed are in pixels
     float obj1Radius=50;
@@ -190,10 +213,10 @@ int main(void)
     //booleans to keep track of direction
     bool obj1Right = true;
     bool obj1Down = true;
+    */
 
 
-
-    Circle obj1 = Circle(50.0f, 1.0f, 0.5f, true, true, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
+    Circle obj1 = Circle(50.0f, 1.0f, 0.5f, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
 
     //50.0f, 1.0f, 0.5f, true, true, 50.0f, 50.0f, { 0.0f,0.0f,1.0f }, "Object1"
 
@@ -209,7 +232,7 @@ int main(void)
     float obj2Y = 50.0f;
     float obj2Color[3] = { 1.0f,0.5f,0.0f }; //color is from 0-1
     std::string obj2Name = "Object2";
-    std::string obj2NewText = obj1Name;
+    std::string obj2NewText = obj2Name;
     //booleans to keep track of direction
     bool obj2Right = false;
     bool obj2Down = true;
@@ -234,7 +257,7 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
 
-
+        /*
         //move Object1 and detecting if it has hit the side of the screen
         if (obj1Right) 
         {
@@ -261,6 +284,7 @@ int main(void)
             if (obj1Y - obj1Radius <= 0)
                 obj1Down = true;
         }
+        */
 
         //move Object2 and detecting if it has hit the side of the screen
         if (obj2Right)
@@ -272,7 +296,7 @@ int main(void)
         else
         {
             obj2X -= obj2SpeedX;
-            if (obj2X - obj2Width <= 0)
+            if (obj2X <= 0)
                 obj2Right = true;
         }
 
@@ -285,7 +309,7 @@ int main(void)
         else
         {
             obj2Y -= obj2SpeedY;
-            if (obj2Y - obj2Length <= 0)
+            if (obj2Y <= 0)
                 obj2Down = true;
         }
         
@@ -297,6 +321,7 @@ int main(void)
 
             //********** Raylib Drawing Content **********
 
+            /*
             //draw the cicle (center x, center y, radius, color(r,g,b,a))
             if(drawObj1){
                 DrawCircle((int)obj1X, (int)obj1Y, obj1Radius, ColorFromNormalized({ obj1Color[0],obj1Color[1],obj1Color[2],1.0f }));
@@ -312,6 +337,10 @@ int main(void)
                     DrawTextEx(font, obj1Name.c_str(), { obj1X - (textSize.x / 3), obj1Y - (textSize.y / 2) }, 18, 1, WHITE);
                 }
             }
+            */
+            //drawing from object rather than independent vars
+            //draw function moved into circle class
+            updateShape(obj1, font);
 
             //draw the rectangle (center x, center y, width, height, color(r,g,b,a))
             if (drawObj2) {
@@ -359,31 +388,31 @@ int main(void)
                     if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
                     {
                         //checkboxes, they directly modify the value (which is why we send a reference)
-                        ImGui::Checkbox("Draw Object1", &drawObj1);
+                        ImGui::Checkbox("Draw Object1", &obj1.drawObj);
                         ImGui::SameLine();
-                        ImGui::Checkbox("Draw Object1 Text", &drawObj1Text);
+                        ImGui::Checkbox("Draw Object1 Text", &obj1.drawObjText);
 
                         //slider, again directly modifies the value and limites between 0 and 300 for this example
-                        ImGui::SliderFloat("Radius", &obj1Radius, 0.0f, 300.0f);
+                        ImGui::SliderFloat("Radius", &obj1.objRadius, 0.0f, 300.0f);
 
-                        ImGui::SliderFloat("SpeedX", &obj1SpeedX, 0.0f, 150.0f);
-                        ImGui::SliderFloat("SpeedY", &obj1SpeedY, 0.0f, 75.0f);
+                        ImGui::SliderFloat("SpeedX", &obj1.objSpeedX, 0.0f, 150.0f);
+                        ImGui::SliderFloat("SpeedY", &obj1.objSpeedY, 0.0f, 75.0f);
 
                         //color picker button, directly modifies the color (3 element float array)
-                        ImGui::ColorEdit3("Object1 Color", obj1Color);
+                        ImGui::ColorEdit3("Object1 Color", obj1.objColor);
 
                         //text input field, directly modifies the string
-                        ImGui::InputText("Text", &obj1NewText);
+                        ImGui::InputText("Text", &obj1.objNewText);
 
                         //Buttons
                         if (ImGui::Button("Reset Object1")) {
-                            obj1X = 50.0;
-                            obj1Y = 50.0;
-                            obj1Radius = 50;
+                            obj1.objX = 50.0;
+                            obj1.objY = 50.0;
+                            obj1.objRadius = 50;
                         }
                         ImGui::SameLine();
                         if (ImGui::Button("Set Text")) {
-                            obj1Name = obj1NewText;
+                            obj1.objName = obj1.objNewText;
                         }
                     }
 
