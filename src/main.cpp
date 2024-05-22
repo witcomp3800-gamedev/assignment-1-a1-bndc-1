@@ -35,42 +35,138 @@ class Shape {
 //Circle Child Class
 class Circle: public Shape {
 
-    int Radius = 0;
+    float objRadius;
+    float objSpeedX;
+    float objSpeedY;
+    bool drawObj;
+    bool drawObjText;
+    float objX;
+    float objY;
+    float objColor[3]; //color is from 0-1
+    std::string objName;
+    std::string objNewText;
 
-    Circle(std::string Name, int X, int Y, int SX, int SY, int Red, int Green, int Blue, int Radius) {
-        this->Name = "";
-        this->X = X;
-        this->Y = Y;
-        this->SX = SX;
-        this->SY = SY;
-        this->Red = Red;
-        this->Green = Green;
-        this->Blue = Blue;
-        this->Radius = Radius;
-        
+    //object direction booleans
+    bool objRight = true;
+    bool objDown = true;
+
+    Circle(float objRadius, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objColor[3], std::string objName) {
+        this->objRadius = objRadius;
+        this->objSpeedX = objSpeedX;
+        this->objSpeedY = objSpeedY;
+        this->drawObj = drawObj;
+        this->drawObjText = drawObjText;
+        this->objX = objX;
+        this->objY = objY;
+        this->objColor[0] = objColor[0];
+        this->objColor[1] = objColor[1];
+        this->objColor[2] = objColor[2];
+        this->objName = objName;
+        this->objNewText = objName;
     }
+
+    void move(int screenWidth, int screenHeight) {
+        if (objRight)
+        {
+            objX += objSpeedX;
+            if (objX + objRadius >= screenWidth)
+                objRight = false;
+        }
+        else
+        {
+            objX -= objSpeedX;
+            if (objX - objRadius <= 0)
+                objRight = true;
+        }
+
+        if (objDown)
+        {
+            objY += objSpeedY;
+            if (objY + objRadius >= screenHeight)
+                objDown = false;
+        }
+        else
+        {
+            objY -= objSpeedY;
+            if (objY - objRadius <= 0)
+                objDown = true;
+        }
+    }
+
 };
 
 //Rect Child Class
 class Rect : public Shape {
 
-    int Length = 0;
-    int Width = 0;
 
-    Rect(std::string Name, int X, int Y, int SX, int SY, int Red, int Green, int Blue, int Length, int Width) {
-        this->Name = "";
-        this->X = X;
-        this->Y = Y;
-        this->SX = SX;
-        this->SY = SY;
-        this->Red = Red;
-        this->Green = Green;
-        this->Blue = Blue;
-        this->Length = Length;
-        this->Width = Width;
+private:
+    float objLength;
+    float objWidth;
+    float objSpeedX;
+    float objSpeedY;
+    bool drawObj;
+    bool drawObjText;
+    float objX;
+    float objY;
+    float objColor[3]; //color is from 0-1
+    std::string objName;
+    std::string objNewText;
 
+    //object direction booleans
+    bool objRight = false;
+    bool objDown = true;
+
+public:
+    Rect(float objLength, float objWidth, float objSpeedX, float objSpeedY, bool drawObj, bool drawObjText, float objX, float objY, float objColor[3], std::string objName) {
+        this->objLength = objLength;
+        this->objWidth = objWidth;
+        this->objSpeedX = objSpeedX;
+        this->objSpeedY = objSpeedY;
+        this->drawObj = drawObj;
+        this->drawObjText = drawObjText;
+        this->objX = objX;
+        this->objY = objY;
+        this->objColor[0] = objColor[0];
+        this->objColor[1] = objColor[1];
+        this->objColor[2] = objColor[2];
+        this->objName = objName;
+        this->objNewText = objName;
     }
+
+    void move(int screenWidth, int screenHeight) {
+        if (objRight)
+        {
+            objX += objSpeedX;
+            if (objX + objWidth >= screenWidth)
+                objRight = false;
+        }
+        else
+        {
+            objX -= objSpeedX;
+            if (objX - objWidth <= 0)
+                objRight = true;
+        }
+
+        if (objDown)
+        {
+            objY += objSpeedY;
+            if (objY + objLength >= screenHeight)
+                objDown = false;
+        }
+        else
+        {
+            objY -= objSpeedY;
+            if (objY - objLength <= 0)
+                objDown = true;
+        }
+    }
+
 };
+
+//object move function
+void Move_Shape(Shape obj) {
+
+}
 
 
 //------------------------------------------------------------------------------------
