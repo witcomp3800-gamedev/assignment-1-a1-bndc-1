@@ -35,8 +35,8 @@ class Shape {
         bool objDown = true;
 
         //virtual function declarations, to apply logic from appropriate subclass
-        virtual void move() {};
-        virtual void draw(Font font) {};
+        virtual void move()=0;
+        virtual void draw(Font font)=0;
 
 };
 
@@ -198,14 +198,14 @@ int main(void)
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "Assignment 1 Starter Code");
-    
+
     //initialize the raylib ImGui backend
     rlImGuiSetup(true);
     //increase ImGui item size to 2x
     ImGui::GetStyle().ScaleAllSizes(2);
 
     // Set raylib to target 60 frames-per-second (this does not mean it will actually RUN at 60 fps)
-    SetTargetFPS(60);               
+    SetTargetFPS(60);
 
     // General variables
     //--------------------------------------------------------------------------------------
@@ -215,16 +215,18 @@ int main(void)
 
     //Object Parameters: Circle(float Radius, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
     Circle obj1 = Circle(50.0f, 1.0f, 0.5f, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
-    
+
     //Object Parameters: Rect(float Length, float Width, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
     Rect obj2 = Rect(30, 60, 1.0f, 0.5f, 900.0f, 50.0f, 1.0f, 0.5f, 0.0f, "Object2");
 
 
     //vector for shape storage
-    std::vector<Shape> shapes;
+    std::vector<Shape> shapes{obj1, obj2};
 
-    shapes.push_back(obj1);
-    shapes.push_back(obj2);
+    std::vector<Circle> circ{obj1};
+
+    //shapes.push_back(obj1);
+    //shapes.push_back(obj2);
 
 
 
@@ -232,9 +234,9 @@ int main(void)
     bool posX = true;
 
     //Let's draw some text to the screen too
-    bool drawText=true;
-    std::string strText= "Some Text";
-    std::string newText= strText;
+    bool drawText = true;
+    std::string strText = "Some Text";
+    std::string newText = strText;
 
     //load a font (Raylib gives warning if font can't be found, then uses default as fallback)
     Font font = LoadFont("assets/Orbitron.ttf");
@@ -251,142 +253,143 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(BLACK);
+        ClearBackground(BLACK);
 
-            //********** Raylib Drawing Content **********
-
-
-            //circle / rect drawing / movement; both done through updateShape function
+        //********** Raylib Drawing Content **********
 
 
-            //iterator for drawing shapes from vector; currently not working
-            /*
-            for (Shape i : shapes) {
-                updateShape(i, font);
+        //circle / rect drawing / movement; both done through updateShape function
+
+
+        //iterator for drawing shapes from vector; currently not working
+
+        
+        for (int i = 0; i < shapes.size(); i++) {
+            updateShape(shapes[i], font);
+        }
+        
+
+
+        //updateShape(obj1, font);
+        //updateShape(obj2, font);
+
+        //draw the text
+        if (drawText) {
+            //get the size (x and y) of the text object
+            //(font,c string, font size, font spaceing)
+            Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
+
+            //draw the text (using the text size to help draw it in the corner
+            //(font,c string, vector2, font size, font spaceing, color)
+            DrawTextEx(font, strText.c_str(), { 0.0f, screenHeight - textSize.y }, 18, 1, WHITE);
+        }
+
+        //********** ImGUI Content *********
+
+        //Draw imgui stuff last so it is over the top of everything else
+        rlImGuiBegin();
+
+        //sets the next window to be at this position
+        //also uses the imgui.ini that gets created at first run
+        ImGui::SetNextWindowSize(ImVec2(350, 250));
+        //creates a new window
+        ImGui::Begin("My Window", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Text("The Window Text!");
+        //A listbox to select which object is being modified
+        const char* items[] = { "Object1","Object2","Text" };
+        static int item_current = 0;
+        ImGui::Combo("Object\nSelect", &item_current, items, IM_ARRAYSIZE(items), 1);
+
+        if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
+        {
+            //checkboxes, they directly modify the value (which is why we send a reference)
+            ImGui::Checkbox("Draw Object1", &obj1.drawObj);
+            ImGui::SameLine();
+            ImGui::Checkbox("Draw Object1 Text", &obj1.drawObjText);
+
+            //slider, again directly modifies the value and limites between 0 and 300 for this example
+            ImGui::SliderFloat("Radius", &obj1.objRadius, 0.0f, 300.0f);
+
+            ImGui::SliderFloat("SpeedX", &obj1.objSpeedX, 0.0f, 150.0f);
+            ImGui::SliderFloat("SpeedY", &obj1.objSpeedY, 0.0f, 75.0f);
+
+            //color picker button, directly modifies the color (3 element float array)
+            ImGui::ColorEdit3("Object1 Color", obj1.objColor);
+
+            //text input field, directly modifies the string
+            ImGui::InputText("Text", &obj1.objNewText);
+
+            //Buttons
+            if (ImGui::Button("Reset Object1")) {
+                obj1.objX = 50.0;
+                obj1.objY = 50.0;
+                obj1.objRadius = 50;
             }
-            */
-
-
-            updateShape(obj1, font);
-            updateShape(obj2, font);
-
-            //draw the text
-            if(drawText){
-                //get the size (x and y) of the text object
-                //(font,c string, font size, font spaceing)
-                Vector2 textSize= MeasureTextEx(font, strText.c_str(), 18, 1);
-
-                //draw the text (using the text size to help draw it in the corner
-                //(font,c string, vector2, font size, font spaceing, color)
-                DrawTextEx(font, strText.c_str(), { 0.0f, screenHeight - textSize.y }, 18, 1, WHITE);
+            ImGui::SameLine();
+            if (ImGui::Button("Set Text")) {
+                obj1.objName = obj1.objNewText;
             }
+        }
 
-            //********** ImGUI Content *********
-            
-            //Draw imgui stuff last so it is over the top of everything else
-            rlImGuiBegin();
+        if (item_current == 1) //when Object2 is selected in the Object Select ComboBox
+        {
+            ImGui::Checkbox("Draw Object2", &obj2.drawObj);
+            ImGui::SameLine();
+            ImGui::Checkbox("Draw Object2 Text", &obj2.drawObjText);
 
-                //sets the next window to be at this position
-                //also uses the imgui.ini that gets created at first run
-                ImGui::SetNextWindowSize(ImVec2(350, 250));
-                //creates a new window
-                ImGui::Begin("My Window",NULL,ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
-                    ImGui::Text("The Window Text!");
-                    //A listbox to select which object is being modified
-                    const char* items[] = { "Object1","Object2","Text"};
-                    static int item_current = 0;
-                    ImGui::Combo("Object\nSelect", &item_current, items, IM_ARRAYSIZE(items),1);
+            //slider, again directly modifies the value and limites between 0 and 300 for this example
+            ImGui::SliderFloat("Length", &obj2.objLength, 0.0f, 300.0f);
+            ImGui::SliderFloat("Width", &obj2.objWidth, 0.0f, 300.0f);
 
-                    if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
-                    {
-                        //checkboxes, they directly modify the value (which is why we send a reference)
-                        ImGui::Checkbox("Draw Object1", &obj1.drawObj);
-                        ImGui::SameLine();
-                        ImGui::Checkbox("Draw Object1 Text", &obj1.drawObjText);
+            ImGui::SliderFloat("SpeedX", &obj2.objSpeedX, 0.0f, 150.0f);
+            ImGui::SliderFloat("SpeedY", &obj2.objSpeedY, 0.0f, 75.0f);
 
-                        //slider, again directly modifies the value and limites between 0 and 300 for this example
-                        ImGui::SliderFloat("Radius", &obj1.objRadius, 0.0f, 300.0f);
+            //color picker button, directly modifies the color (3 element float array)
+            ImGui::ColorEdit3("Object1 Color", obj2.objColor);
 
-                        ImGui::SliderFloat("SpeedX", &obj1.objSpeedX, 0.0f, 150.0f);
-                        ImGui::SliderFloat("SpeedY", &obj1.objSpeedY, 0.0f, 75.0f);
+            //text input field, directly modifies the string
+            ImGui::InputText("Text", &obj2.objNewText);
 
-                        //color picker button, directly modifies the color (3 element float array)
-                        ImGui::ColorEdit3("Object1 Color", obj1.objColor);
+            //Buttons
+            if (ImGui::Button("Reset Object1")) {
+                obj2.objX = 1000.0;
+                obj2.objY = 50.0;
+                obj2.objLength = 30;
+                obj2.objWidth = 60;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Set Text")) {
+                obj2.objName = obj2.objNewText;
+            }
+        }
 
-                        //text input field, directly modifies the string
-                        ImGui::InputText("Text", &obj1.objNewText);
+        if (item_current == 2) //when Text is selected in the Object Select ComboBox
+        {
+            //checkboxes, they directly modify the value (which is why we send a reference)
+            ImGui::Checkbox("Draw Text", &drawText);
 
-                        //Buttons
-                        if (ImGui::Button("Reset Object1")) {
-                            obj1.objX = 50.0;
-                            obj1.objY = 50.0;
-                            obj1.objRadius = 50;
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Set Text")) {
-                            obj1.objName = obj1.objNewText;
-                        }
-                    }
+            //text input field, directly modifies the string
+            ImGui::InputText("Text", &newText);
 
-                    if (item_current == 1) //when Object2 is selected in the Object Select ComboBox
-                    {
-                        ImGui::Checkbox("Draw Object2", &obj2.drawObj);
-                        ImGui::SameLine();
-                        ImGui::Checkbox("Draw Object2 Text", &obj2.drawObjText);
+            //buttons, returns true if clicked on this frame
+            if (ImGui::Button("Set Text")) {
+                strText = newText;
+            }
+        }
 
-                        //slider, again directly modifies the value and limites between 0 and 300 for this example
-                        ImGui::SliderFloat("Length", &obj2.objLength, 0.0f, 300.0f);
-                        ImGui::SliderFloat("Width", &obj2.objWidth, 0.0f, 300.0f);
+        //The next item will be on the same line as the previous one
+        //ImGui::SameLine();
 
-                        ImGui::SliderFloat("SpeedX", &obj2.objSpeedX, 0.0f, 150.0f);
-                        ImGui::SliderFloat("SpeedY", &obj2.objSpeedY, 0.0f, 75.0f);
 
-                        //color picker button, directly modifies the color (3 element float array)
-                        ImGui::ColorEdit3("Object1 Color", obj2.objColor);
+    //ends this window
+        ImGui::End();
 
-                        //text input field, directly modifies the string
-                        ImGui::InputText("Text", &obj2.objNewText);
+        //show ImGui Demo Content if you want to see it
+        //bool open = true;
+        //ImGui::ShowDemoWindow(&open);
 
-                        //Buttons
-                        if (ImGui::Button("Reset Object1")) {
-                            obj2.objX = 1000.0;
-                            obj2.objY = 50.0;
-                            obj2.objLength = 30;
-                            obj2.objWidth = 60;
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Set Text")) {
-                            obj2.objName = obj2.objNewText;
-                        }
-                    }
-
-                    if (item_current == 2) //when Text is selected in the Object Select ComboBox
-                    {
-                        //checkboxes, they directly modify the value (which is why we send a reference)
-                        ImGui::Checkbox("Draw Text", &drawText);
-
-                        //text input field, directly modifies the string
-                        ImGui::InputText("Text", &newText);
-
-                        //buttons, returns true if clicked on this frame
-                        if (ImGui::Button("Set Text")) {
-                            strText = newText;
-                        }
-                    }
-
-                    //The next item will be on the same line as the previous one
-                    //ImGui::SameLine();
-
-                    
-                //ends this window
-                ImGui::End();
-
-                //show ImGui Demo Content if you want to see it
-                //bool open = true;
-                //ImGui::ShowDemoWindow(&open);
-
-            // end ImGui Content
-            rlImGuiEnd();
+    // end ImGui Content
+        rlImGuiEnd();
 
         EndDrawing();
         //----------------------------------------------------------------------------------
