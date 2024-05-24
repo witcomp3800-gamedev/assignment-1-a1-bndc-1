@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 //original dimensions: 1280 x 800
@@ -64,6 +65,22 @@ class Circle: public Shape {
             this->objColor[2] = objB;
             this->objName = objName;
             this->objNewText = objName;
+
+            if (objSpeedX >= 0) {
+                objRight = true;
+            }
+            else {
+                objRight = false;
+                this->objSpeedX = -objSpeedX;
+            }
+
+            if (objSpeedY >= 0) {
+                objDown = true;
+            }
+            else {
+                objDown = false;
+                this->objSpeedY = -objSpeedY;
+            }
         }
 
         void move() {
@@ -71,26 +88,26 @@ class Circle: public Shape {
             {
                 objX += objSpeedX;
                 if (objX + objRadius >= windowWidth)
-                    this->objRight = false;
+                    objRight = false;
             }
             else
             {
                 objX -= objSpeedX;
                 if (objX - objRadius <= 0)
-                    this->objRight = true;
+                    objRight = true;
             }
 
             if (objDown)
             {
                 objY += objSpeedY;
                 if (objY + objRadius >= windowHeight)
-                    this->objDown = false;
+                    objDown = false;
             }
             else
             {
                 objY -= objSpeedY;
                 if (objY - objRadius <= 0)
-                    this->objDown = true;
+                    objDown = true;
             }
         }
 
@@ -161,6 +178,22 @@ class Rect : public Shape {
             this->objColor[2] = objB;
             this->objName = objName;
             this->objNewText = objName;
+
+            if (objSpeedX >= 0) {
+                objRight = true;
+            }
+            else {
+                objRight = false;
+                this->objSpeedX = -objSpeedX;
+            }
+
+            if (objSpeedY >= 0) {
+                objDown = true;
+            }
+            else {
+                objDown = false;
+                this->objSpeedY = -objSpeedY;
+            }
         }
 
         void move() {
@@ -256,8 +289,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    
-    
+
+
     const int screenWidth = windowWidth;
     const int screenHeight = windowHeight;
 
@@ -300,12 +333,59 @@ int main(void)
     std::ifstream input;
     input.open("assets/input.txt");
     std::string line;
-
-    while (getline(input,line)) {
-        
+    
 
         
-    }
+        while(getline(input, line)) {
+
+            std::istringstream iss(line);
+            std::string temp;
+
+            iss >> temp;
+
+            if (temp == "Window") {
+
+            }
+
+            if (temp == "Window") {
+
+            }
+            else if (temp == "Font") {
+
+            }
+            else if (temp == "Circle") {
+                //creates a temporary vector of all attributes listed in a line of the input file & creates a circle
+                std::vector<std::string> tempv;
+                while (getline(iss, temp, ' ')) {
+                    tempv.push_back(temp);
+                }
+                
+                for (int i = 0; i < tempv.size(); i++) {
+                    std::cout << tempv[i] << " ";
+                }
+                std::cout << std::endl;
+
+                //parsing vector elements to individual temp variables for circle creation
+                std::string tName = tempv[1];
+                float tRadius = std::stof(tempv[9]);
+                float tSpeedX = std::stof(tempv[4]);
+                float tSpeedY = std::stof(tempv[5]);
+                float tX = std::stof(tempv[2]);
+                float tY = std::stof(tempv[3]);
+                float tRed = std::stof(tempv[6]);
+                float tGreen = std::stof(tempv[7]);
+                float tBlue = std::stof(tempv[8]);
+                
+                Circle* tempc = new Circle(tRadius, tSpeedX, tSpeedY, tX, tY, tRed, tGreen, tBlue, tName);
+                shapes.push_back(tempc);
+                
+            }
+            else if (temp == "Rectangle") {
+
+            }
+        }
+        
+        input.close();
 
 
     bool posY = true;
