@@ -8,7 +8,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-
 #include <vector>
 
 //original dimensions: 1280 x 800
@@ -257,6 +256,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+    
+    
     const int screenWidth = windowWidth;
     const int screenHeight = windowHeight;
 
@@ -293,6 +294,18 @@ int main(void)
 
     shapes.push_back(&obj1);
     shapes.push_back(&obj2);
+
+
+    //file read testing
+    std::ifstream input;
+    input.open("assets/input.txt");
+    std::string line;
+
+    while (getline(input,line)) {
+        
+
+        
+    }
 
 
     bool posY = true;
