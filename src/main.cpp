@@ -11,6 +11,8 @@
 #include <sstream>
 #include <vector>
 
+float fontColor[3] = { 0.0,0.0,0.0 };
+int fontSize = 10;
 
 //Shape Parent Class
 class Shape {
@@ -79,11 +81,12 @@ class Circle: public Shape {
             {
                 //get the size (x and y) of the text object
                 //(font,c string, font size, font spaceing)
-                Vector2 textSize = MeasureTextEx(font, objName.c_str(), 18, 1);
+                Vector2 textSize = MeasureTextEx(font, objName.c_str(), fontSize, 1);
+                
 
                 //draw the text (using the text size to help draw it in the corner
                 //(font,c string, vector2, font size, font spaceing, color)
-                DrawTextEx(font, objName.c_str(), { objX - (textSize.x / 2), objY - (textSize.y / 2) }, 18, 1, WHITE);
+                DrawTextEx(font, objName.c_str(), { objX - (textSize.x / 2), objY - (textSize.y / 2) }, fontSize, 1, ColorFromNormalized({ fontColor[0],fontColor[1],fontColor[2],1.0f }));
             }
         }
 
@@ -149,11 +152,11 @@ class Rect : public Shape {
                 {
                     //get the size (x and y) of the text object
                     //(font,c string, font size, font spaceing)
-                    Vector2 textSize = MeasureTextEx(font, objName.c_str(), 18, 1);
+                    Vector2 textSize = MeasureTextEx(font, objName.c_str(), fontSize, 1);
 
                     //draw the text (using the text size to help draw it in the corner
                     //(font,c string, vector2, font size, font spaceing, color)
-                    DrawTextEx(font, objName.c_str(), { (objX + objWidth*objScale/2) - (textSize.x / 2), (objY + objLength*objScale/2) - (textSize.y / 2) }, 18, 1, WHITE);
+                    DrawTextEx(font, objName.c_str(), { (objX + objWidth*objScale/2) - (textSize.x / 2), (objY + objLength*objScale/2) - (textSize.y / 2) }, fontSize, 1, ColorFromNormalized({ fontColor[0],fontColor[1],fontColor[2],1.0f}));
                 }
             }
         }
@@ -204,6 +207,8 @@ int main(void)
     int screenWidth = 300;
     int screenHeight = 300;
 
+    const char* fontName = "";
+
     //file read testing
     std::ifstream input;
     input.open("assets/input.txt");
@@ -233,7 +238,22 @@ int main(void)
                 screenHeight = std::stoi(tempv[3]);
             }
             else if (temp == "Font") {
+                std::vector<std::string> tempv;
+                while (getline(iss, temp, ' ')) {
+                    tempv.push_back(temp);
+                }
 
+                for (int i = 0; i < tempv.size(); i++) {
+                    std::cout << tempv[i] << " ";
+                }
+                std::cout << tempv[4] << " ";
+                std::cout << std::endl;
+
+                fontName = tempv[1].c_str();
+                fontSize = std::stoi(tempv[2]);
+                fontColor[0] = std::stof(tempv[3]);
+                fontColor[1] = std::stof(tempv[4]);
+                fontColor[2] = std::stof(tempv[5]);
             }
             else if (temp == "Circle") {
                 //creates a temporary vector of all attributes listed in a line of the input file & creates a circle
@@ -314,14 +334,9 @@ int main(void)
     bool posY = true;
     bool posX = true;
 
-    //Let's draw some text to the screen too
-    bool drawText = false;
-    std::string strText = "Some Text";
-    std::string newText = strText;
-
+    
     //load a font (Raylib gives warning if font can't be found, then uses default as fallback)
-    Font font = LoadFont("assets/Orbitron.ttf");
-
+    Font font = LoadFont(fontName);
     
 
     // Main game loop
@@ -359,21 +374,6 @@ int main(void)
             circles[i].simulateObj = simulate;
             updateShape(circles[i], font, screenWidth, screenHeight);
         }
-        
-
-        //updateShape(obj1, font);
-        //updateShape(obj2, font);
-
-        //draw the text
-        if (drawText) {
-            //get the size (x and y) of the text object
-            //(font,c string, font size, font spaceing)
-            Vector2 textSize = MeasureTextEx(font, strText.c_str(), 18, 1);
-
-            //draw the text (using the text size to help draw it in the corner
-            //(font,c string, vector2, font size, font spaceing, color)
-            DrawTextEx(font, strText.c_str(), { 0.0f, screenHeight - textSize.y }, 18, 1, WHITE);
-        }
 
         //********** ImGUI Content *********
 
@@ -408,7 +408,6 @@ int main(void)
         }
 
         for (int i = 0; i < rects.size(); i++) {
-            //updateShape(rects[i], font);
             if (item_current == i+circles.size()) //when Text is selected in the Object Select ComboBox
             {
                 rects[i].addImgui();
