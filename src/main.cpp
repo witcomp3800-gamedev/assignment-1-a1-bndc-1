@@ -12,8 +12,8 @@
 #include <vector>
 
 //original dimensions: 1280 x 800
-const int windowWidth = 1000;
-const int windowHeight = 500;
+//const int windowWidth = 1000;
+//const int windowHeight = 500;
 
 
 //Shape Parent Class
@@ -38,7 +38,7 @@ class Shape {
         virtual ~Shape() {};
 
         //virtual function declarations, to apply logic from appropriate subclass
-        virtual void move()=0;
+        virtual void move(int windowWidth, int windowHeight)=0;
         virtual void draw(Font font)=0;
         virtual void addImgui() = 0;
 
@@ -83,7 +83,7 @@ class Circle: public Shape {
             }
         }
 
-        void move() {
+        void move(int windowWidth, int windowHeight) {
             if (objRight)
             {
                 objX += objSpeedX;
@@ -196,7 +196,7 @@ class Rect : public Shape {
             }
         }
 
-        void move() {
+        void move(int windowWidth, int windowHeight) {
             if (objRight)
             {
                 objX += objSpeedX;
@@ -274,11 +274,11 @@ class Rect : public Shape {
 };
 
 //object update function
-void updateShape(Shape& obj, Font font) {
+void updateShape(Shape& obj, Font font, int windowWidth, int windowHeight) {
     if (obj.drawObj) {
         obj.draw(font);
     }
-    obj.move();
+    obj.move(windowWidth, windowHeight);
 }
 
 
@@ -290,44 +290,11 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
+    std::vector<Circle> circles{};
+    std::vector<Rect> rects{};
 
-    const int screenWidth = windowWidth;
-    const int screenHeight = windowHeight;
-
-    SetConfigFlags(FLAG_WINDOW_HIGHDPI);
-    InitWindow(screenWidth, screenHeight, "Assignment 1 Starter Code");
-
-    //initialize the raylib ImGui backend
-    rlImGuiSetup(true);
-    //increase ImGui item size to 2x
-    ImGui::GetStyle().ScaleAllSizes(2);
-
-    // Set raylib to target 60 frames-per-second (this does not mean it will actually RUN at 60 fps)
-    SetTargetFPS(60);
-
-    // General variables
-    //--------------------------------------------------------------------------------------
-
-
-    //circle & rect initialization
-
-    //Object Parameters: Circle(float Radius, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
-    Circle obj1 = Circle(50.0f, 1.0f, 0.5f, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
-
-    //Object Parameters: Rect(float Length, float Width, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
-    Rect obj2 = Rect(30, 60, 1.0f, 0.5f, 900.0f, 50.0f, 1.0f, 0.5f, 0.0f, "Object2");
-
-
-    //vector for shape storage
-    //std::vector<Shape*> shapes;
-
-    std::vector<Shape*> shapes{};
-
-    //std::vector<Circle> circ{obj1};
-
-    shapes.push_back(&obj1);
-    shapes.push_back(&obj2);
-
+    int screenWidth = 300;
+    int screenHeight = 300;
 
     //file read testing
     std::ifstream input;
@@ -344,11 +311,18 @@ int main(void)
             iss >> temp;
 
             if (temp == "Window") {
+                std::vector<std::string> tempv;
+                while (getline(iss, temp, ' ')) {
+                    tempv.push_back(temp);
+                }
 
-            }
+                for (int i = 0; i < tempv.size(); i++) {
+                    std::cout << tempv[i] << " ";
+                }
+                std::cout << std::endl;
 
-            if (temp == "Window") {
-
+                screenWidth = std::stoi(tempv[2]);
+                screenHeight = std::stoi(tempv[3]);
             }
             else if (temp == "Font") {
 
@@ -376,23 +350,69 @@ int main(void)
                 float tGreen = std::stof(tempv[7]);
                 float tBlue = std::stof(tempv[8]);
                 
-                Circle* tempc = new Circle(tRadius, tSpeedX, tSpeedY, tX, tY, tRed, tGreen, tBlue, tName);
-                shapes.push_back(tempc);
+                circles.push_back(Circle(tRadius, tSpeedX, tSpeedY, tX, tY, tRed, tGreen, tBlue, tName));
                 
             }
             else if (temp == "Rectangle") {
+                std::vector<std::string> tempv;
+                while (getline(iss, temp, ' ')) {
+                    tempv.push_back(temp);
+                }
 
+                for (int i = 0; i < tempv.size(); i++) {
+                    std::cout << tempv[i] << " ";
+                }
+                std::cout << std::endl;
+
+                std::string tName = tempv[1];
+                float tLength = std::stof(tempv[9]);
+                float tWidth = std::stof(tempv[10]);
+                float tSpeedX = std::stof(tempv[4]);
+                float tSpeedY = std::stof(tempv[5]);
+                float tX = std::stof(tempv[2]);
+                float tY = std::stof(tempv[3]);
+                float tRed = std::stof(tempv[6]);
+                float tGreen = std::stof(tempv[7]);
+                float tBlue = std::stof(tempv[8]);
+
+                rects.push_back(Rect(tLength, tWidth, tSpeedX, tSpeedY, tX, tY, tRed, tGreen, tBlue, tName));
             }
         }
         
         input.close();
 
+    SetConfigFlags(FLAG_WINDOW_HIGHDPI);
+    InitWindow(screenWidth, screenHeight, "Assignment1Soln");
+
+    //initialize the raylib ImGui backend
+    rlImGuiSetup(true);
+    //increase ImGui item size to 2x
+    ImGui::GetStyle().ScaleAllSizes(2);
+
+    // Set raylib to target 60 frames-per-second (this does not mean it will actually RUN at 60 fps)
+    SetTargetFPS(60);
+
+    // General variables
+    //--------------------------------------------------------------------------------------
+
+
+    //circle & rect initialization
+
+    //Object Parameters: Circle(float Radius, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
+    // Circle obj1 = Circle(50.0f, 1.0f, 0.5f, 50.0f, 50.0f, 0.0f, 0.0f, 1.0f, "Object1");
+
+    //Object Parameters: Rect(float Length, float Width, float SpeedX, float SpeedY, float X, float Y, float Red, float Green, float Blue, string Name)
+    //Rect obj2 = Rect(30, 60, 1.0f, 0.5f, 900.0f, 50.0f, 1.0f, 0.5f, 0.0f, "Object2");
+
+
+    //vector for shape storage
+    //std::vector<Shape*> shapes;
 
     bool posY = true;
     bool posX = true;
 
     //Let's draw some text to the screen too
-    bool drawText = true;
+    bool drawText = false;
     std::string strText = "Some Text";
     std::string newText = strText;
 
@@ -401,7 +421,6 @@ int main(void)
 
     //shapes[0]->draw(font);
     //shapes[1]->draw(font);
-
 
     // Main game loop
     //--------------------------------------------------------------------------------------
@@ -426,8 +445,12 @@ int main(void)
         //iterator for drawing shapes from vector; currently not working
 
         
-        for (int i = 0; i < shapes.size(); i++) {            
-            updateShape(*shapes[i], font);
+        for (int i = 0; i < rects.size(); i++) {            
+            updateShape(rects[i], font, screenWidth, screenHeight);
+        }
+
+        for (int i = 0; i < circles.size(); i++) {
+            updateShape(circles[i], font, screenWidth, screenHeight);
         }
         
 
@@ -455,35 +478,28 @@ int main(void)
         //also uses the imgui.ini that gets created at first run
         ImGui::SetNextWindowSize(ImVec2(350, 250));
         //creates a new window
-        ImGui::Begin("My Window", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-        ImGui::Text("The Window Text!");
+        ImGui::Begin("Assignment 1 Controls", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Text("All Shape Controls");
+
+        ImGui::Text("Selected Shape Controls");
         //A listbox to select which object is being modified
-        const char* items[] = { "Object1","Object2","Text" };
+
+        const char* items[] = {"CGreen","CCyan","CYellow","RRed","RMagenta","RBlue"};
         static int item_current = 0;
         ImGui::Combo("Object\nSelect", &item_current, items, IM_ARRAYSIZE(items), 1);
 
-        if (item_current == 0) //when Object1 is selected in the Object Select ComboBox
-        {
-            obj1.addImgui();
+        for (int i = 0; i < circles.size(); i++) {
+            if (item_current == i) //when Text is selected in the Object Select ComboBox
+            {
+                circles[i].addImgui();
+            }
         }
 
-        if (item_current == 1) //when Object2 is selected in the Object Select ComboBox
-        {
-            obj2.addImgui();
-
-        }
-
-        if (item_current == 2) //when Text is selected in the Object Select ComboBox
-        {
-            //checkboxes, they directly modify the value (which is why we send a reference)
-            ImGui::Checkbox("Draw Text", &drawText);
-
-            //text input field, directly modifies the string
-            ImGui::InputText("Text", &newText);
-
-            //buttons, returns true if clicked on this frame
-            if (ImGui::Button("Set Text")) {
-                strText = newText;
+        for (int i = 0; i < rects.size(); i++) {
+            //updateShape(rects[i], font);
+            if (item_current == i+circles.size()) //when Text is selected in the Object Select ComboBox
+            {
+                rects[i].addImgui();
             }
         }
 
